@@ -1,0 +1,71 @@
+//
+//
+// build.gradle
+//
+// Created by Caleb Tillman on 2/17/2020
+// Copyright © 2020 Kin+Carta. All rights reserved.
+//
+//
+
+buildscript {
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:2.2.4.RELEASE"
+        classpath "org.springframework.cloud:spring-cloud-contract-gradle-plugin:2.2.1.RELEASE"
+    }
+}
+
+plugins {
+    id 'org.springframework.boot' version '2.2.4.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+    id "org.springframework.cloud.contract" version "2.2.1.RELEASE"
+}
+
+apply plugin: 'spring-cloud-contract'
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudVersion', "Hoxton.SR1")
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'com.sun.xml.bind:jaxb-osgi:2.4.0-b180830.0438'
+    testImplementation('org.springframework.cloud:spring-cloud-starter-contract-verifier') {
+        exclude group: 'com.sun.xml.bind:jaxb-osgi', module: 'jaxb-osgi'
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-contract-dependencies:2.2.1.RELEASE"
+    }
+}
+
+contracts {
+    testFramework = org.springframework.cloud.contract.verifier.config.TestFramework.JUNIT5
+    baseClassForTests = 'com.example.Test.BaseTestClass'
+
+}
+
+test {
+    useJUnitPlatform()
+}
